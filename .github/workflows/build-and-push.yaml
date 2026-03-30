@@ -28,7 +28,7 @@ jobs:
         # Buildx = advanced Docker build tool (faster, better caching)
 
       # Step 3: Login to Docker Hub
-      - name: Login to Docker Hub
+      - name: Login to Docker Hubx
         uses: docker/login-action@v3
         with:
           username: ${{ env.DOCKER_HUB_USERNAME }}
@@ -42,7 +42,7 @@ jobs:
           COMMIT_SHA=${{ github.sha }}
           SHORT_SHA=${COMMIT_SHA:0:7}  # First 7 chars of commit hash
           echo "backend_tags=${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-backend:latest,${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-backend:$SHORT_SHA" >> $GITHUB_OUTPUT
-          echo "ui_tags=${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-ui:latest,${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-ui:$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "ui_tags=${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-frontend:latest,${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-frontend:$SHORT_SHA" >> $GITHUB_OUTPUT
         # Creates tags like:
         # - docker.io/rprakashdass/pos-backend:latest
         # - docker.io/rprakashdass/pos-backend:a1b2c3d
@@ -58,12 +58,12 @@ jobs:
           cache-from: type=gha  # Use GitHub's caching (faster builds)
           cache-to: type=gha,mode=max
 
-      # Step 6: Build and push pos-ui
-      - name: Build and push pos-ui
+      # Step 6: Build and push pos-frontend
+      - name: Build and push pos-frontend
         uses: docker/build-push-action@v5
         with:
-          context: ./pos-ui
-          file: ./pos-ui/Dockerfile
+          context: ./pos-frontend
+          file: ./pos-frontend/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.ui_tags }}
           cache-from: type=gha
@@ -74,5 +74,5 @@ jobs:
         run: |
           echo "✅ Build completed successfully!"
           echo "Backend image: ${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-backend:latest"
-          echo "UI image: ${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-ui:latest"
+          echo "UI image: ${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-frontend:latest"
           echo "Commit: ${{ github.sha }}"
