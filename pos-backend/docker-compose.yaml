@@ -1,0 +1,46 @@
+version: '3.8'
+services:
+  pos-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: "pos-backend"
+    ports:
+      - "8082:8082"
+    depends_on:
+      pos-db:
+        condition: service_healthy
+    networks:
+      - pos-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://pos-db:3306/posdb
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: rootpass
+    volumes:
+      - backend_logs:/app/logs
+
+  pos-db:
+    image: mysql:8.0
+    container_name: pos-db
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: posdb
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - pos-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data:
+  backend_logs:
+
+networks:
+  pos-network:
+    driver: bridge
