@@ -1,0 +1,78 @@
+name: Build and Push to Docker Hub
+
+# TRIGGER: When does this workflow run?
+on:
+  push:
+    branches:
+      - main  # Only run on pushes to main branch
+
+# ENVIRONMENT VARIABLES
+env:
+  DOCKER_HUB_USERNAME: rprakashdass
+  REGISTRY: docker.io
+
+# JOBS: What to do when workflow runs
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest  # Run on GitHub's Linux servers
+
+    steps:
+      # Step 1: Get the code from GitHub
+      - name: Checkout code
+        uses: actions/checkout@v4
+        # This clones your repository so we have the code to build
+
+      # Step 2: Set up Docker
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        # Buildx = advanced Docker build tool (faster, better caching)
+
+      # Step 3: Login to Docker Hub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}  # ← This comes from GitHub Secrets
+        # This authenticates us to Docker Hub so we can push images
+
+      # Step 4: Generate image tags
+      - name: Generate image tags
+        id: meta
+        run: |
+          COMMIT_SHA=${{ github.sha }}
+          SHORT_SHA=${COMMIT_SHA:0:7}  # First 7 chars of commit hash
+          echo "backend_tags=${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-backend:latest,${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-backend:$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "ui_tags=${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-ui:latest,${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-ui:$SHORT_SHA" >> $GITHUB_OUTPUT
+        # Creates tags like:
+        # - docker.io/rprakashdass/pos-backend:latest
+        # - docker.io/rprakashdass/pos-backend:a1b2c3d
+
+      # Step 5: Build and push pos-backend
+      - name: Build and push pos-backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./pos-backend  # Where the Dockerfile is
+          file: ./pos-backend/Dockerfile
+          push: true  # Actually push to Docker Hub (not just build locally)
+          tags: ${{ steps.meta.outputs.backend_tags }}
+          cache-from: type=gha  # Use GitHub's caching (faster builds)
+          cache-to: type=gha,mode=max
+
+      # Step 6: Build and push pos-ui
+      - name: Build and push pos-ui
+        uses: docker/build-push-action@v5
+        with:
+          context: ./pos-ui
+          file: ./pos-ui/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.ui_tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Step 7: Print summary
+      - name: Print build summary
+        run: |
+          echo "✅ Build completed successfully!"
+          echo "Backend image: ${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-backend:latest"
+          echo "UI image: ${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-ui:latest"
+          echo "Commit: ${{ github.sha }}"
