@@ -52,7 +52,7 @@ jobs:
           file: ./pos-backend/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.backend_tags }}
-          platforms: linux/amd64,linux/arm64   # ← ADD THIS
+          platforms: linux/amd64
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -64,7 +64,7 @@ jobs:
           file: ./pos-frontend/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.ui_tags }}
-          platforms: linux/amd64,linux/arm64   # ← ADD THIS
+          platforms: linux/amd64
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
