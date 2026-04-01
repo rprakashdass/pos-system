@@ -16,7 +16,7 @@ spec:
       containers:
         - name: pos-frontend
           image: docker.io/rprakashdass/pos-frontend:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
           env:

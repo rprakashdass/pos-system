@@ -1,9 +1,9 @@
 package com.rprakashdass.possystem.dao;
 
+import java.util.List;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-
-import java.util.List;
 
 public abstract class AbstractDao<T> {
 
@@ -24,6 +24,19 @@ public abstract class AbstractDao<T> {
     }
 
     public T save(T entity) {
+        if (isNew(entity)) {
+            em.persist(entity);
+            return entity;
+        }
         return em.merge(entity);
+    }
+
+    private boolean isNew(T entity) {
+        try {
+            Object id = entity.getClass().getMethod("getId").invoke(entity);
+            return id == null;
+        } catch (Exception e) {
+            return true;
+        }
     }
 }

@@ -1,0 +1,51 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.2)
+
+2026-04-01T13:29:35.543+05:30  INFO 61735 --- [pos-system] [           main] c.r.possystem.PosSystemApplication       : Starting PosSystemApplication v0.0.1-SNAPSHOT using Java 25.0.1 with PID 61735 (/Users/prakashdass/Projects/intellige/pos/pos-backend/target/pos-system-0.0.1-SNAPSHOT.jar started by prakashdass in /Users/prakashdass/Projects/intellige/pos/pos-backend)
+2026-04-01T13:29:35.548+05:30  INFO 61735 --- [pos-system] [           main] c.r.possystem.PosSystemApplication       : No active profile set, falling back to 1 default profile: "default"
+2026-04-01T13:29:36.596+05:30  INFO 61735 --- [pos-system] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-01T13:29:36.633+05:30  INFO 61735 --- [pos-system] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 24 ms. Found 0 JPA repository interfaces.
+2026-04-01T13:29:37.194+05:30  INFO 61735 --- [pos-system] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8082 (http)
+2026-04-01T13:29:37.231+05:30  INFO 61735 --- [pos-system] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-01T13:29:37.232+05:30  INFO 61735 --- [pos-system] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-04-01T13:29:37.264+05:30  INFO 61735 --- [pos-system] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1594 ms
+2026-04-01T13:29:37.455+05:30  INFO 61735 --- [pos-system] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-01T13:29:37.539+05:30  INFO 61735 --- [pos-system] [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.1.Final
+2026-04-01T13:29:38.164+05:30  INFO 61735 --- [pos-system] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-01T13:29:38.191+05:30  INFO 61735 --- [pos-system] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-04-01T13:29:38.798+05:30  INFO 61735 --- [pos-system] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@745cf754
+2026-04-01T13:29:38.799+05:30  INFO 61735 --- [pos-system] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-04-01T13:29:38.931+05:30  WARN 61735 --- [pos-system] [           main] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-01T13:29:38.961+05:30  INFO 61735 --- [pos-system] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://localhost:3306/posdb]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 8.0.45
+	Default catalog/schema: posdb/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-01T13:29:40.724+05:30  INFO 61735 --- [pos-system] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-01T13:29:41.623+05:30  INFO 61735 --- [pos-system] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-01T13:29:41.764+05:30  WARN 61735 --- [pos-system] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-04-01T13:29:41.811+05:30  INFO 61735 --- [pos-system] [           main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2026-04-01T13:29:42.225+05:30  INFO 61735 --- [pos-system] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8082 (http) with context path '/api'
+2026-04-01T13:29:42.242+05:30  INFO 61735 --- [pos-system] [           main] c.r.possystem.PosSystemApplication       : Started PosSystemApplication in 7.364 seconds (process running for 8.123)
+2026-04-01T13:29:51.227+05:30  INFO 61735 --- [pos-system] [nio-8082-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-01T13:29:51.228+05:30  INFO 61735 --- [pos-system] [nio-8082-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-04-01T13:29:51.241+05:30  INFO 61735 --- [pos-system] [nio-8082-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 13 ms
+2026-04-01T13:31:17.530+05:30  INFO 61735 --- [pos-system] [ionShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-04-01T13:31:18.547+05:30  INFO 61735 --- [pos-system] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-04-01T13:31:18.558+05:30  INFO 61735 --- [pos-system] [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-01T13:31:18.565+05:30  INFO 61735 --- [pos-system] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-04-01T13:31:18.585+05:30  INFO 61735 --- [pos-system] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.

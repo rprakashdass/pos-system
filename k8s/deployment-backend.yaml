@@ -16,7 +16,7 @@ spec:
       containers:
         - name: pos-backend
           image: docker.io/rprakashdass/pos-backend:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 8082
           env:
