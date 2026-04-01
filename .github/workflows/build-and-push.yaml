@@ -28,7 +28,7 @@ jobs:
         # Buildx = advanced Docker build tool (faster, better caching)
 
       # Step 3: Login to Docker Hub
-      - name: Login to Docker Hubx
+      - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ env.DOCKER_HUB_USERNAME }}
@@ -43,19 +43,17 @@ jobs:
           SHORT_SHA=${COMMIT_SHA:0:7}  # First 7 chars of commit hash
           echo "backend_tags=${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-backend:latest,${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-backend:$SHORT_SHA" >> $GITHUB_OUTPUT
           echo "ui_tags=${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-frontend:latest,${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-frontend:$SHORT_SHA" >> $GITHUB_OUTPUT
-        # Creates tags like:
-        # - docker.io/rprakashdass/pos-backend:latest
-        # - docker.io/rprakashdass/pos-backend:a1b2c3d
 
       # Step 5: Build and push pos-backend
       - name: Build and push pos-backend
         uses: docker/build-push-action@v5
         with:
-          context: ./pos-backend  # Where the Dockerfile is
+          context: ./pos-backend
           file: ./pos-backend/Dockerfile
-          push: true  # Actually push to Docker Hub (not just build locally)
+          push: true
           tags: ${{ steps.meta.outputs.backend_tags }}
-          cache-from: type=gha  # Use GitHub's caching (faster builds)
+          platforms: linux/amd64,linux/arm64   # ← ADD THIS
+          cache-from: type=gha
           cache-to: type=gha,mode=max
 
       # Step 6: Build and push pos-frontend
@@ -66,6 +64,7 @@ jobs:
           file: ./pos-frontend/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.ui_tags }}
+          platforms: linux/amd64,linux/arm64   # ← ADD THIS
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
