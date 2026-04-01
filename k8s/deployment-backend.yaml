@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pos-backend
+  namespace: pos
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: pos-backend
+  template:
+    metadata:
+      labels:
+        app: pos-backend
+    spec:
+      containers:
+        - name: pos-backend
+          image: docker.io/rprakashdass/pos-backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8082
+          env:
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: pos-secret
+                  key: pos_db_username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pos-secret
+                  key: pos_db_password
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: pos-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: pos-config
+                  key: DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: pos-config
+                  key: DB_NAME
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "200m"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8082
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8082
+            initialDelaySeconds: 20
+            periodSeconds: 20

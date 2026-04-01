@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pos-frontend
+  namespace: pos
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: pos-frontend
+  template:
+    metadata:
+      labels:
+        app: pos-frontend
+    spec:
+      containers:
+        - name: pos-frontend
+          image: docker.io/rprakashdass/pos-frontend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          env:
+            - name: BACKEND_API_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: pos-config
+                  key: BACKEND_API_URL
+          resources:
+            limits:
+              cpu: "200m"
+              memory: "512Mi"
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+          readinessProbe:
+            httpGet:
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 20

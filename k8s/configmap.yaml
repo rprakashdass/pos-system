@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pos-config
+  namespace: pos
+
+data:
+  # Database connection (endpoint)
+  DB_HOST: pos-db.pos.svc.cluster.local  # K8s internal DNS
+  DB_PORT: "3306"
+  DB_NAME: posdb
+
+  # Backend API endpoint (for frontend to reach backend)
+  BACKEND_API_URL: http://pos-backend-service:8082/api
+
+  # Spring Boot settings
+  SPRING_JPA_HIBERNATE_DDL_AUTO: create
+  SPRING_JPA_SHOW_SQL: "false"
