@@ -1,9 +1,13 @@
 package com.rprakashdass.possystem.pojo;
 
-import jakarta.persistence.*;
-import lombok.Data;
+import java.time.LocalDateTime;
 
-import java.time.ZonedDateTime;
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Version;
+import lombok.Data;
 
 @Data
 @MappedSuperclass
@@ -12,22 +16,21 @@ public abstract class BaseEntity {
     @Version
     private Long version;
 
-    @Column(nullable = false, updatable = false)
-    private ZonedDateTime createdAt;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-    @Column(nullable = false)
-    private ZonedDateTime updatedAt;
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
-        ZonedDateTime now = ZonedDateTime.now();
-        createdAt = now;
-        updatedAt = now;
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = ZonedDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
-
 }

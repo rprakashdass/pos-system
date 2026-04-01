@@ -64,6 +64,8 @@ jobs:
           file: ./pos-frontend/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.ui_tags }}
+          build-args: |
+            NEXT_PUBLIC_API_BASE_URL=http://pos-backend-service:8082/api
           platforms: linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
