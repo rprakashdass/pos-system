@@ -52,7 +52,7 @@ jobs:
           file: ./pos-backend/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.backend_tags }}
-          platforms: linux/arm64
+          platforms: linux/amd64
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
