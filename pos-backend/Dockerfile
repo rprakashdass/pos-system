@@ -15,10 +15,7 @@ WORKDIR /app
 COPY --from=builder /app/target/pos-system-0.0.1-SNAPSHOT.jar pos-system.jar
 
 # copy OTel agent
-COPY opentelemetry-javaagent.jar /otel/opentelemetry-javaagent.jar
-
-# JVM options
-ENV JAVA_TOOL_OPTIONS="-javaagent:/otel/opentelemetry-javaagent.jar"
+RUN curl -L https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar -o /otel/opentelemetry-javaagent.jar
 
 EXPOSE 8082
 ENTRYPOINT ["java", "-jar", "pos-system.jar"]

@@ -16,7 +16,7 @@ import com.rprakashdass.possystem.dto.OrderDto;
 import com.rprakashdass.possystem.models.order.OrderForm;
 
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/orders")
 public class OrderController {
 
     @Autowired

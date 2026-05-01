@@ -16,7 +16,7 @@ import com.rprakashdass.possystem.dto.ProductDto;
 import com.rprakashdass.possystem.models.product.ProductForm;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/products")
 public class ProductController {
 
     @Autowired

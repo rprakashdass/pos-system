@@ -15,7 +15,7 @@ import com.rprakashdass.possystem.dto.InvoiceDto;
 import com.rprakashdass.possystem.models.invoice.InvoiceForm;
 
 @RestController
-@RequestMapping("/api/invoices")
+@RequestMapping("/invoices")
 public class InvoiceController {
 
     @Autowired

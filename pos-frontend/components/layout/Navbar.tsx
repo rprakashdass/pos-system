@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, Settings, Package, ShoppingCart } from "lucide-react";
+import { LayoutDashboard, Users, Settings, Package, ShoppingCart, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -11,6 +11,7 @@ const navItems = [
   { name: "Clients", href: "/clients", icon: Users },
   { name: "Products", href: "/products", icon: Package },
   { name: "Orders", href: "/orders", icon: ShoppingCart },
+  { name: "Invoices", href: "/invoices", icon: FileText },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
