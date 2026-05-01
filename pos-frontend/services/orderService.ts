@@ -1,4 +1,4 @@
-import { Order } from "@/types/orderTypes";
+import { Order, OrderFormData, OrderStatus } from "@/types/orderTypes";
 import apiService from "./apiService";
 
 class OrderService {
@@ -12,12 +12,12 @@ class OrderService {
         return await apiService.get<Order>(`${this.endpoint}/${id}`);
     }
 
-    async create(order: Omit<Order, 'id' | 'orderDate' | 'totalAmount'>) {
+    async create(order: OrderFormData) {
         return await apiService.post<Order>(this.endpoint, order);
     }
 
-    async update(id: number, order: Omit<Order, 'id' | 'orderDate' | 'totalAmount'>) {
-        return await apiService.put<Order>(`${this.endpoint}/${id}`, order);
+    async updateStatus(id: number, status: OrderStatus) {
+        return await apiService.put<Order>(`${this.endpoint}/${id}`, { status });
     }
 
     async delete(id: number) {

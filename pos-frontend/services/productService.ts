@@ -1,4 +1,4 @@
-import { Product } from "@/types/productTypes";
+import { Product, ProductFormData } from "@/types/productTypes";
 import apiService from "./apiService";
 
 class ProductService {
@@ -12,11 +12,11 @@ class ProductService {
         return await apiService.get<Product>(`${this.endpoint}/${id}`);
     }
 
-    async create(product: Omit<Product, 'id'>) {
+    async create(product: ProductFormData) {
         return await apiService.post<Product>(this.endpoint, product);
     }
 
-    async update(id: number, product: Omit<Product, 'id'>) {
+    async update(id: number, product: ProductFormData) {
         return await apiService.put<Product>(`${this.endpoint}/${id}`, product);
     }
 

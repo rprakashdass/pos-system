@@ -1,17 +1,28 @@
-import { Client } from "./clientTypes";
-import { Product } from "./productTypes";
-
-export interface Order {
-    id: number;
-    orderDate: string;
-    totalAmount: number;
-    client: Client;
-    items: OrderItem[];
-}
+export type OrderStatus = "PENDING" | "INVOICED" | "CANCELLED" | "COMPLETED";
 
 export interface OrderItem {
     id: number;
+    productId: number;
     quantity: number;
-    price: number;
-    product: Product;
+    sellingPrice: number;
+}
+
+export interface Order {
+    id: number;
+    clientId: number;
+    status: OrderStatus;
+    totalPrice: number;
+    createdAt: string;
+    items: OrderItem[];
+}
+
+export interface OrderItemFormData {
+    productId: number;
+    quantity: number;
+}
+
+export interface OrderFormData {
+    clientId: number;
+    items: OrderItemFormData[];
+    status?: OrderStatus;
 }

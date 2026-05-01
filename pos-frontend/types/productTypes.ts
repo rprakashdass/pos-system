@@ -1,7 +1,16 @@
 export interface Product {
     id: number;
     name: string;
-    description: string;
+    barcode: string;
+    description?: string;
     price: number;
-    quantity: number;
+    clientId: number;
+}
+
+export interface ProductFormData {
+    name: string;
+    barcode: string;
+    description?: string;
+    price: number;
+    clientId: number;
 }
