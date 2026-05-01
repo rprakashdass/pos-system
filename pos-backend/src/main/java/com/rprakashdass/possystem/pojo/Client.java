@@ -14,7 +14,7 @@ public class Client extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "client_id")
-    private Integer id;
+    private Long id;
 
     @Column(name = "client_name", nullable = false)
     private String name;
