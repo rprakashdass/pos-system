@@ -48,6 +48,12 @@ public class ProductApi {
         return ProductConversionUtil.convert(existingProduct);
     }
 
+    @Transactional
+    public void delete(Long id) {
+        Product product = getProduct(id);
+        dao.delete(product);
+    }
+
     public Product getProduct(Long id) {
         Product product = dao.findById(id);
         if (product == null) {

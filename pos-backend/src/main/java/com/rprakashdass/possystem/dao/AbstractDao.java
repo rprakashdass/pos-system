@@ -31,6 +31,24 @@ public abstract class AbstractDao<T> {
         return em.merge(entity);
     }
 
+    public void delete(T entity) {
+        if (entity == null) {
+            return;
+        }
+        T managedEntity = em.contains(entity) ? entity : em.merge(entity);
+        em.remove(managedEntity);
+    }
+
+    public void deleteById(Long id) {
+        if (id == null) {
+            return;
+        }
+        T entity = findById(id);
+        if (entity != null) {
+            em.remove(entity);
+        }
+    }
+
     private boolean isNew(T entity) {
         try {
             Object id = entity.getClass().getMethod("getId").invoke(entity);

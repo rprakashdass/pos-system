@@ -91,6 +91,12 @@ public class OrderApi {
         return OrderConversionUtil.convert(order);
     }
 
+    @Transactional
+    public void delete(Long id) {
+        Order order = getOrder(id);
+        orderDao.delete(order);
+    }
+
     public Order getOrder(Long id) {
         Order order = orderDao.findById(id);
         if (order == null) {
