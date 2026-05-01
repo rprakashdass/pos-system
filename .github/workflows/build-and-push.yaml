@@ -4,7 +4,8 @@ name: Build and Push to Docker Hub
 on:
   push:
     branches:
-      - main  # Only run on pushes to main branch
+      # - main  # Only run on pushes to main branch
+      - dev
 
 # ENVIRONMENT VARIABLES
 env:
