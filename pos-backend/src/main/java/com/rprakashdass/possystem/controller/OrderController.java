@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.rprakashdass.possystem.api.OrderApi;
 import com.rprakashdass.possystem.dto.OrderDto;
 import com.rprakashdass.possystem.models.order.OrderForm;
+import com.rprakashdass.possystem.models.order.OrderStatusForm;
 
 @RestController
 @RequestMapping("/orders")
@@ -41,6 +42,11 @@ public class OrderController {
     @PutMapping("/{id}")
     public OrderDto update(@PathVariable Long id, @RequestBody OrderForm form) {
         return api.update(id, form);
+    }
+
+    @PutMapping("/{id}/status")
+    public OrderDto updateStatus(@PathVariable Long id, @RequestBody OrderStatusForm form) {
+        return api.updateStatus(id, form.getStatus());
     }
 
     @DeleteMapping("/{id}")

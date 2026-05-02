@@ -5,11 +5,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.rprakashdass.possystem.Enums.OrderStatus;
 import com.rprakashdass.possystem.dao.ClientDao;
+import com.rprakashdass.possystem.dao.InventoryDao;
 import com.rprakashdass.possystem.dao.OrderDao;
 import com.rprakashdass.possystem.dao.OrderItemDao;
 import com.rprakashdass.possystem.dao.ProductDao;
@@ -18,6 +21,7 @@ import com.rprakashdass.possystem.exception.ResourceNotFoundException;
 import com.rprakashdass.possystem.models.order.OrderForm;
 import com.rprakashdass.possystem.models.order.OrderItemForm;
 import com.rprakashdass.possystem.pojo.Client;
+import com.rprakashdass.possystem.pojo.Inventory;
 import com.rprakashdass.possystem.pojo.Order;
 import com.rprakashdass.possystem.pojo.OrderItem;
 import com.rprakashdass.possystem.pojo.Product;
@@ -34,6 +38,8 @@ public class OrderApi {
     private ProductDao productDao;
     @Autowired
     private ClientDao clientDao;
+    @Autowired
+    private InventoryDao inventoryDao;
 
     @Transactional
     public OrderDto add(OrderForm form) {
@@ -47,6 +53,14 @@ public class OrderApi {
 
         for (OrderItemForm itemForm : form.getItems()) {
             Product product = getProduct(itemForm.getProductId());
+            Inventory inventory = getInventoryForProduct(product.getId());
+
+            if (inventory.getQuantity() < itemForm.getQuantity()) {
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT,
+                        "Insufficient inventory for product ID " + product.getId());
+            }
+
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
             orderItem.setProduct(product);
@@ -54,6 +68,9 @@ public class OrderApi {
             orderItem.setSellingPrice(product.getPrice());
             orderItems.add(orderItem);
             totalPrice += itemForm.getQuantity() * product.getPrice();
+
+            inventory.setQuantity(inventory.getQuantity() - itemForm.getQuantity());
+            inventoryDao.save(inventory);
         }
 
         order.setTotalPrice(totalPrice);
@@ -92,6 +109,14 @@ public class OrderApi {
     }
 
     @Transactional
+    public OrderDto updateStatus(Long id, OrderStatus status) {
+        Order order = getOrder(id);
+        order.setStatus(status);
+        orderDao.save(order);
+        return OrderConversionUtil.convert(order);
+    }
+
+    @Transactional
     public void delete(Long id) {
         Order order = getOrder(id);
         orderDao.delete(order);
@@ -119,5 +144,15 @@ public class OrderApi {
             throw new ResourceNotFoundException("Client with given ID not found: " + id);
         }
         return client;
+    }
+
+    private Inventory getInventoryForProduct(Long productId) {
+        List<Inventory> inventoryList = inventoryDao.findByProductId(productId.intValue());
+        if (inventoryList.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Inventory not found for product ID " + productId);
+        }
+        return inventoryList.get(0);
     }
 }

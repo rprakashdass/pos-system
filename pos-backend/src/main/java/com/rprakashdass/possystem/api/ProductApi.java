@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.rprakashdass.possystem.dao.ClientDao;
 import com.rprakashdass.possystem.dao.ProductDao;
 import com.rprakashdass.possystem.dto.ProductDto;
 import com.rprakashdass.possystem.exception.ResourceNotFoundException;
 import com.rprakashdass.possystem.models.product.ProductForm;
+import com.rprakashdass.possystem.pojo.Client;
 import com.rprakashdass.possystem.pojo.Product;
 import com.rprakashdass.possystem.util.conversion.ProductConversionUtil;
 
@@ -19,9 +21,12 @@ public class ProductApi {
 
     @Autowired
     private ProductDao dao;
+    @Autowired
+    private ClientDao clientDao;
 
     @Transactional
     public ProductDto add(ProductForm form) {
+        getClient(form.getClientId());
         Product product = ProductConversionUtil.convert(form);
         dao.save(product);
         return ProductConversionUtil.convert(product);
@@ -43,6 +48,7 @@ public class ProductApi {
     @Transactional
     public ProductDto update(Long id, ProductForm form) {
         Product existingProduct = getProduct(id);
+        getClient(form.getClientId());
         ProductConversionUtil.convert(form, existingProduct);
         dao.save(existingProduct);
         return ProductConversionUtil.convert(existingProduct);
@@ -60,5 +66,13 @@ public class ProductApi {
             throw new ResourceNotFoundException("Product with given ID not found: " + id);
         }
         return product;
+    }
+
+    private Client getClient(Long id) {
+        Client client = clientDao.findById(id);
+        if (client == null) {
+            throw new ResourceNotFoundException("Client with given ID not found: " + id);
+        }
+        return client;
     }
 }
