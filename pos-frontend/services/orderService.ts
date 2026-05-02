@@ -17,7 +17,7 @@ class OrderService {
     }
 
     async updateStatus(id: number, status: OrderStatus) {
-        return await apiService.put<Order>(`${this.endpoint}/${id}`, { status });
+        return await apiService.put<Order>(`${this.endpoint}/${id}/status`, { status });
     }
 
     async delete(id: number) {

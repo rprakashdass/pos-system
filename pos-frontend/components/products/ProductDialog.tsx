@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Product, ProductFormData } from "@/types/productTypes";
+import { Client } from "@/types/clientTypes";
+import clientService from "@/services/clientService";
 import { useToast } from "@/components/ui/toaster";
 import { getApiErrorMessage } from "@/lib/getApiErrorMessage";
 
@@ -34,9 +36,26 @@ const ProductDialog: React.FC<ProductDialogProps> = ({
   const { toast } = useToast();
   const [formData, setFormData] = useState<ProductFormData>(emptyForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loadingClients, setLoadingClients] = useState(false);
 
   useEffect(() => {
     if (!show) return;
+
+    const loadClients = async () => {
+      try {
+        setLoadingClients(true);
+        const data = await clientService.getAll();
+        setClients(data);
+      } catch (error) {
+        const msg = getApiErrorMessage(error);
+        toast({ variant: "destructive", title: "Failed to load clients", description: msg.description ?? msg.title });
+      } finally {
+        setLoadingClients(false);
+      }
+    };
+
+    loadClients();
 
     if (mode === "edit" && initialProduct) {
       setFormData({
@@ -137,14 +156,26 @@ const ProductDialog: React.FC<ProductDialogProps> = ({
               onChange={handleChange}
               required
             />
-            <Input
+            <select
               name="clientId"
-              type="number"
-              placeholder="Client ID"
               value={String(formData.clientId)}
-              onChange={handleChange}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  clientId: Number(e.target.value),
+                }))
+              }
+              className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+              disabled={loadingClients}
               required
-            />
+            >
+              <option value="0">{loadingClients ? "Loading clients..." : "Select client"}</option>
+              {clients.map((client) => (
+                <option key={client.id} value={client.id}>
+                  {client.name} (#{client.id})
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 

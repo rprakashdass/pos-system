@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ClipboardList, Plus } from "lucide-react";
-import { Order, OrderFormData } from "@/types/orderTypes";
+import { Order, OrderFormData, OrderStatus } from "@/types/orderTypes";
 import orderService from "@/services/orderService";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +14,7 @@ import { getApiErrorMessage } from "@/lib/getApiErrorMessage";
 
 export default function OrdersPage() {
     const [orders, setOrders] = useState<Order[]>([]);
+    const [statusDrafts, setStatusDrafts] = useState<Record<number, OrderStatus>>({});
     const [loading, setLoading] = useState(true);
     const [dialogOpen, setDialogOpen] = useState(false);
     const { toast } = useToast();
@@ -27,6 +28,12 @@ export default function OrdersPage() {
             setLoading(true);
             const data = await orderService.getAll();
             setOrders(data);
+            setStatusDrafts(
+                data.reduce<Record<number, OrderStatus>>((acc, order) => {
+                    acc[order.id] = order.status;
+                    return acc;
+                }, {})
+            );
         } catch (error) {
             const msg = getApiErrorMessage(error);
             toast({ variant: "destructive", title: "Failed to load orders", description: msg.description ?? msg.title });
@@ -52,6 +59,21 @@ export default function OrdersPage() {
             toast({ variant: "destructive", title: msg.title, description: msg.description });
         }
     };
+
+    const handleStatusUpdate = async (order: Order) => {
+        try {
+            const nextStatus = statusDrafts[order.id] ?? order.status;
+            const updated = await orderService.updateStatus(order.id, nextStatus);
+            setOrders((prev) => prev.map((it) => (it.id === updated.id ? updated : it)));
+            setStatusDrafts((prev) => ({ ...prev, [updated.id]: updated.status }));
+            toast({ title: "Order status updated" });
+        } catch (error) {
+            const msg = getApiErrorMessage(error);
+            toast({ variant: "destructive", title: msg.title, description: msg.description });
+        }
+    };
+
+    const statusOptions: OrderStatus[] = ["PENDING", "CREATED", "INVOICED", "CANCELLED", "COMPLETED"];
 
     return (
         <PageContainer>
@@ -109,15 +131,40 @@ export default function OrdersPage() {
                                         <TableCell>{order.status}</TableCell>
                                         <TableCell>{new Date(order.createdAt).toLocaleString()}</TableCell>
                                         <TableCell>{order.totalPrice}</TableCell>
-                                        <TableCell className="space-x-2">
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="text-red-500"
-                                                onClick={() => handleDelete(order)}
+                                        <TableCell className="space-y-2">
+                                            <select
+                                                className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                                                value={statusDrafts[order.id] ?? order.status}
+                                                onChange={(e) =>
+                                                    setStatusDrafts((prev) => ({
+                                                        ...prev,
+                                                        [order.id]: e.target.value as OrderStatus,
+                                                    }))
+                                                }
                                             >
-                                                Delete
-                                            </Button>
+                                                {statusOptions.map((status) => (
+                                                    <option key={status} value={status}>
+                                                        {status}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <div className="space-x-2">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => handleStatusUpdate(order)}
+                                                >
+                                                    Update Status
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="text-red-500"
+                                                    onClick={() => handleDelete(order)}
+                                                >
+                                                    Delete
+                                                </Button>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 ))
