@@ -98,31 +98,37 @@ const AddOrderDialog: React.FC<AddOrderDialogProps> = ({ show, onClose, onSubmit
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          <Input
-            name="clientId"
-            type="number"
-            placeholder="Client ID"
-            value={clientId}
-            onChange={(e) => setClientId(e.target.value)}
-            required
-          />
+          <div>
+            <label htmlFor="clientId" className="block text-sm font-medium text-muted-foreground mb-1">
+              Client ID
+            </label>
+            <Input
+              id="clientId"
+              name="clientId"
+              type="number"
+              value={clientId}
+              onChange={(e) => setClientId(e.target.value)}
+              required
+              className=""
+            />
+          </div>
 
           <div className="space-y-3">
             {items.map((row, idx) => (
               <div key={idx} className="grid grid-cols-1 md:grid-cols-6 gap-3 items-center">
                 <div className="md:col-span-3">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">Product ID</label>
                   <Input
                     type="number"
-                    placeholder="Product ID"
                     value={row.productId}
                     onChange={(e) => updateItem(idx, { productId: e.target.value })}
                     required
                   />
                 </div>
                 <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">Quantity</label>
                   <Input
                     type="number"
-                    placeholder="Qty"
                     value={row.quantity}
                     onChange={(e) => updateItem(idx, { quantity: e.target.value })}
                     required
