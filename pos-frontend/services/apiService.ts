@@ -11,14 +11,15 @@ class ApiService {
       headers: {
         'Content-Type': 'application/json',
       },
+      withCredentials: true,
     });
 
     this.api.interceptors.request.use(
-        (config) => config,
-        (error) => {
-          console.error('API Request Error:', error);
-          return Promise.reject(error);
-        }
+      (config) => config,
+      (error) => {
+        console.error('API Request Error:', error);
+        return Promise.reject(error);
+      }
     );
   }
 

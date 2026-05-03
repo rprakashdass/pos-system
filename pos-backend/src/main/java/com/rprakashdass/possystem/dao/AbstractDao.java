@@ -4,6 +4,7 @@ import java.util.List;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.springframework.transaction.annotation.Transactional;
 
 public abstract class AbstractDao<T> {
 
@@ -23,6 +24,7 @@ public abstract class AbstractDao<T> {
         return em.createQuery("SELECT e FROM " + entityClass.getSimpleName() + " e", entityClass).getResultList();
     }
 
+    @Transactional
     public T save(T entity) {
         if (isNew(entity)) {
             em.persist(entity);
@@ -31,6 +33,7 @@ public abstract class AbstractDao<T> {
         return em.merge(entity);
     }
 
+    @Transactional
     public void delete(T entity) {
         if (entity == null) {
             return;
@@ -39,6 +42,7 @@ public abstract class AbstractDao<T> {
         em.remove(managedEntity);
     }
 
+    @Transactional
     public void deleteById(Long id) {
         if (id == null) {
             return;

@@ -2,8 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, Settings, Package, ShoppingCart, FileText, FlaskConical } from "lucide-react";
+import { LayoutDashboard, Users, Settings, Package, ShoppingCart, FileText, FlaskConical, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import apiService from "@/services/apiService";
 
@@ -19,6 +20,7 @@ const navItems = [
 
 export const Navbar = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const [backendOnline, setBackendOnline] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -40,6 +42,14 @@ export const Navbar = () => {
       clearInterval(id);
     };
   }, []);
+
+  const logout = async () => {
+    try {
+      await apiService.post('/auth/logout', {});
+    } finally {
+      router.replace('/login');
+    }
+  };
 
   const dotClass = backendOnline === null ? 'bg-gray-300' : backendOnline ? 'bg-emerald-500' : 'bg-red-500';
 
@@ -75,6 +85,14 @@ export const Navbar = () => {
               {item.name}
             </Link>
           ))}
+          <button
+            type="button"
+            onClick={logout}
+            className="flex items-center text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            Logout
+          </button>
         </div>
       </div>
     </nav>
