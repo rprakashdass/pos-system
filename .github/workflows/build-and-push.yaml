@@ -52,9 +52,10 @@ jobs:
           file: ./pos-backend/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.backend_tags }}
-          platforms: linux/amd64
+          platforms: linux/arm64 
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          # linux/amd64
 
       # Step 6: Build and push pos-frontend
       - name: Build and push pos-frontend
@@ -66,7 +67,7 @@ jobs:
           tags: ${{ steps.meta.outputs.ui_tags }}
           build-args: |
             NEXT_PUBLIC_API_BASE_URL=/api
-          platforms: linux/amd64
+          platforms: linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
