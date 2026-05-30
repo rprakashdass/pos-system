@@ -17,15 +17,11 @@
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>
 
-        <OpenTelemetry name="OpenTelemetry"
-                       endpoint="${sys:otlp.endpoint}"
-                       serviceName="pos-backend"/>
     </Appenders>
     <Loggers>
         <Root level="info">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="RollingFile"/>
-            <AppenderRef ref="OpenTelemetry"/>
         </Root>
     </Loggers>
 </Configuration>
