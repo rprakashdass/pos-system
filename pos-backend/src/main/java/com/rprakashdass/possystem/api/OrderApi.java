@@ -26,9 +26,13 @@ import com.rprakashdass.possystem.pojo.Order;
 import com.rprakashdass.possystem.pojo.OrderItem;
 import com.rprakashdass.possystem.pojo.Product;
 import com.rprakashdass.possystem.util.conversion.OrderConversionUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Service
 public class OrderApi {
+
+    private static final Logger logger = LogManager.getLogger(OrderApi.class);
 
     @Autowired
     private OrderDao orderDao;
@@ -43,6 +47,7 @@ public class OrderApi {
 
     @Transactional
     public OrderDto add(OrderForm form) {
+        logger.info("Creating new order for client ID: {}", form.getClientId());
         Client client = getClient(form.getClientId());
         Order order = new Order();
         order.setClient(client);
@@ -52,10 +57,12 @@ public class OrderApi {
         double totalPrice = 0;
 
         for (OrderItemForm itemForm : form.getItems()) {
+            logger.debug("Processing order item for product ID: {} with quantity: {}", itemForm.getProductId(), itemForm.getQuantity());
             Product product = getProduct(itemForm.getProductId());
             Inventory inventory = getInventoryForProduct(product.getId());
 
             if (inventory.getQuantity() < itemForm.getQuantity()) {
+                logger.warn("Insufficient inventory for product ID: {}. Required: {}, Available: {}", product.getId(), itemForm.getQuantity(), inventory.getQuantity());
                 throw new ResponseStatusException(
                         HttpStatus.CONFLICT,
                         "Insufficient inventory for product ID " + product.getId());
@@ -81,18 +88,20 @@ public class OrderApi {
         {
             orderItemDao.save(item);
         }
-
+        logger.info("Successfully created order with ID: {} for client ID: {}", order.getId(), client.getId());
         return OrderConversionUtil.convert(order);
     }
 
     @Transactional(readOnly = true)
     public OrderDto get(Long id) {
+        logger.info("Fetching order with ID: {}", id);
         Order order = getOrder(id);
         return OrderConversionUtil.convert(order);
     }
 
     @Transactional(readOnly = true)
     public List<OrderDto> getAll() {
+        logger.info("Fetching all orders.");
         return orderDao.findAll().stream()
                 .map(OrderConversionUtil::convert)
                 .collect(Collectors.toList());
@@ -125,6 +134,7 @@ public class OrderApi {
     public Order getOrder(Long id) {
         Order order = orderDao.findById(id);
         if (order == null) {
+            logger.error("Order with ID: {} not found.", id);
             throw new ResourceNotFoundException("Order with given ID not found: " + id);
         }
         return order;
@@ -133,6 +143,7 @@ public class OrderApi {
     private Product getProduct(Long id) {
         Product product = productDao.findById(id);
         if (product == null) {
+            logger.error("Product with ID: {} not found while creating order.", id);
             throw new ResourceNotFoundException("Product with given ID not found: " + id);
         }
         return product;
@@ -141,6 +152,7 @@ public class OrderApi {
     private Client getClient(Long id) {
         Client client = clientDao.findById(id);
         if (client == null) {
+            logger.error("Client with ID: {} not found while creating order.", id);
             throw new ResourceNotFoundException("Client with given ID not found: " + id);
         }
         return client;
@@ -149,9 +161,8 @@ public class OrderApi {
     private Inventory getInventoryForProduct(Long productId) {
         List<Inventory> inventoryList = inventoryDao.findByProductId(productId.intValue());
         if (inventoryList.isEmpty()) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Inventory not found for product ID " + productId);
+            logger.error("Inventory not found for product ID: {}", productId);
+            throw new ResourceNotFoundException("Inventory not found for product ID: " + productId);
         }
         return inventoryList.get(0);
     }
