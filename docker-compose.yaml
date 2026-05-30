@@ -30,6 +30,10 @@ services:
       - pos-backend
     networks:
       - pos-network
+    environment:
+      # Next.js rewrite proxy target (server-side) so the browser can call /api/*
+      # without cross-origin session/cookie issues.
+      API_PROXY_TARGET: http://pos-backend:8082
 
   pos-db:
     image: mysql:8.0

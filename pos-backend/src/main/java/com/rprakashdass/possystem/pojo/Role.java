@@ -1,4 +1,4 @@
-package com.rprakashdass.possystem.entity;
+package com.rprakashdass.possystem.pojo;
 
 import java.util.List;
 import java.util.Set;

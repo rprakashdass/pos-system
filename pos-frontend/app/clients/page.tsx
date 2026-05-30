@@ -35,7 +35,7 @@ const ClientsPage: React.FC = () => {
   const fetchClients = async () => {
     try {
       setLoading(true);
-      let data = await clientService.getAll();
+      const data = await clientService.getAll();
       setClients(data);
     } catch (error) {
       const msg = getApiErrorMessage(error);

@@ -10,7 +10,7 @@ import com.rprakashdass.possystem.dao.UserRepository;
 import com.rprakashdass.possystem.dto.AuthenticationRequest;
 import com.rprakashdass.possystem.dto.AuthenticationResponse;
 import com.rprakashdass.possystem.dto.RegisterRequest;
-import com.rprakashdass.possystem.entity.User;
+import com.rprakashdass.possystem.pojo.User;
 
 import lombok.RequiredArgsConstructor;
 

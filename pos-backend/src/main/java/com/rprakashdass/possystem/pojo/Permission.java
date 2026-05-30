@@ -1,4 +1,4 @@
-package com.rprakashdass.possystem.entity;
+package com.rprakashdass.possystem.pojo;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

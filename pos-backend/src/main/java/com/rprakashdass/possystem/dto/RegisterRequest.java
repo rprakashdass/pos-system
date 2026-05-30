@@ -1,6 +1,6 @@
 package com.rprakashdass.possystem.dto;
 
-import com.rprakashdass.possystem.entity.Role;
+import com.rprakashdass.possystem.pojo.Role;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

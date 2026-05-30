@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.rprakashdass.possystem.entity.User;
+import com.rprakashdass.possystem.pojo.User;
 
 @RestController
 @RequestMapping("/v1/users")

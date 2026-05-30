@@ -1,84 +1,110 @@
 name: Build and Push to Docker Hub
 
-# TRIGGER: When does this workflow run?
 on:
   push:
     branches:
-      # - main  # Only run on pushes to main branch
       - dev
+    paths:
+      - 'pos-backend/**'
+      - 'pos-frontend/**'
+      - '.github/workflows/**'
 
-# ENVIRONMENT VARIABLES
 env:
   DOCKER_HUB_USERNAME: rprakashdass
   REGISTRY: docker.io
 
-# JOBS: What to do when workflow runs
 jobs:
-  build-and-push:
-    runs-on: ubuntu-latest  # Run on GitHub's Linux servers
-
+  # Detects which services changed so downstream jobs can skip unnecessary builds
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.changes.outputs.backend }}
+      frontend: ${{ steps.changes.outputs.frontend }}
     steps:
-      # Step 1: Get the code from GitHub
-      - name: Checkout code
-        uses: actions/checkout@v4
-        # This clones your repository so we have the code to build
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
-      # Step 2: Set up QEMU for cross-platform emulation
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+      - name: Detect changed services
+        id: changes
+        run: |
+          # Fall back to listing all files on first commit (no HEAD~1)
+          CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || git ls-files)
+          echo "Changed files: $CHANGED"
 
-      # Step 3: Set up Docker Buildx
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        # Buildx = advanced Docker build tool (faster, better caching)
+          # Workflow changes trigger both builds to validate the pipeline itself
+          if echo "$CHANGED" | grep -q "^pos-backend/\|^\.github/workflows/"; then
+            echo "backend=true" >> $GITHUB_OUTPUT
+          else
+            echo "backend=false" >> $GITHUB_OUTPUT
+          fi
 
-      # Step 3: Login to Docker Hub
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
+          if echo "$CHANGED" | grep -q "^pos-frontend/\|^\.github/workflows/"; then
+            echo "frontend=true" >> $GITHUB_OUTPUT
+          else
+            echo "frontend=false" >> $GITHUB_OUTPUT
+          fi
+
+  build-backend:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
         with:
           username: ${{ env.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}  # ← This comes from GitHub Secrets
-        # This authenticates us to Docker Hub so we can push images
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
-      # Step 4: Generate image tags
-      - name: Generate image tags
-        id: meta
-        run: |
-          COMMIT_SHA=${{ github.sha }}
-          SHORT_SHA=${COMMIT_SHA:0:7}  # First 7 chars of commit hash
-          echo "backend_tags=${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-backend:latest,${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-backend:$SHORT_SHA" >> $GITHUB_OUTPUT
-          echo "ui_tags=${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-frontend:latest,${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-frontend:$SHORT_SHA" >> $GITHUB_OUTPUT
+      - name: Set short SHA
+        id: vars
+        run: echo "sha=${GITHUB_SHA:0:7}" >> $GITHUB_OUTPUT
 
-      # Step 5: Build and push pos-backend
       - name: Build and push pos-backend
         uses: docker/build-push-action@v5
         with:
           context: ./pos-backend
           file: ./pos-backend/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.backend_tags }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-backend:latest
+            ${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-backend:${{ steps.vars.outputs.sha }}
           platforms: linux/amd64,linux/arm64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,mode=max,scope=backend
 
-      # Step 6: Build and push pos-frontend
+  build-frontend:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      - name: Set short SHA
+        id: vars
+        run: echo "sha=${GITHUB_SHA:0:7}" >> $GITHUB_OUTPUT
+
       - name: Build and push pos-frontend
         uses: docker/build-push-action@v5
         with:
           context: ./pos-frontend
           file: ./pos-frontend/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.ui_tags }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-frontend:latest
+            ${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-frontend:${{ steps.vars.outputs.sha }}
           build-args: |
             NEXT_PUBLIC_API_BASE_URL=/api
           platforms: linux/amd64,linux/arm64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      # Step 7: Print summary
-      - name: Print build summary
-        run: |
-          echo "✅ Build completed successfully!"
-          echo "Backend image: ${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-backend:latest"
-          echo "UI image: ${{ env.REGISTRY }}/${{ env.DOCKER_HUB_USERNAME }}/pos-frontend:latest"
-          echo "Commit: ${{ github.sha }}"
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,mode=max,scope=frontend
