@@ -18,17 +18,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PageContainer, PageHeader } from "@/components/layout/PageContainer";
 import AddClientDialog from "@/components/clients/AddClientDialog";
+import { useToast } from "@/components/ui/toaster";
+import { getApiErrorMessage } from "@/lib/getApiErrorMessage";
 
 const ClientsPage: React.FC = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [formData, setFormData] = useState<Omit<Client, "id">>({
-    name: "",
-    email: "",
-    phoneNumber: "",
-  });
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchClients();
@@ -39,26 +37,22 @@ const ClientsPage: React.FC = () => {
       setLoading(true);
       let data = await clientService.getAll();
       setClients(data);
-      } catch (error) {
-        console.error("Error fetching clients:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    } catch (error) {
+      const msg = getApiErrorMessage(error);
+      toast({
+        variant: "destructive",
+        title: "Failed to load clients",
+        description: msg.description ?? msg.title,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-    const handleAddClient = async (clientData: ClientFormData) => {
-        try {
-            await clientService.create(clientData);
-            await fetchClients();
-        } catch (err: any) {
-            throw err;
-        }
-    };
+  const handleAddClient = async (clientData: ClientFormData) => {
+    await clientService.create(clientData);
+    await fetchClients();
+  };
 
 
   const filteredClients = clients.filter(
@@ -78,7 +72,7 @@ const ClientsPage: React.FC = () => {
         icon={Users}
       >
         <Button
-          className="flex items-center gap-1 border border-b-black"
+          className="flex items-center gap-1"
           onClick={() => setIsDialogOpen(true)}
         >
           <Plus size={18} />

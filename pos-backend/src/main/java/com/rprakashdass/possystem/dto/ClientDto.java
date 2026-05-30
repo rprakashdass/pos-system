@@ -1,14 +1,15 @@
 package com.rprakashdass.possystem.dto;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.rprakashdass.possystem.api.ClientApi;
 import com.rprakashdass.possystem.models.client.ClientData;
 import com.rprakashdass.possystem.models.client.ClientForm;
 import com.rprakashdass.possystem.pojo.Client;
 import com.rprakashdass.possystem.util.conversion.EntityToData;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 public class ClientDto {
@@ -45,5 +46,9 @@ public class ClientDto {
         String phoneNumber = form.getPhoneNumber();
         List<Client> clients = clientApi.searchClients(id, name, phoneNumber, email);
         return clients.stream().map(EntityToData::convertClientEntityToData).toList();
+    }
+
+    public void delete(Long id) {
+        clientApi.delete(id);
     }
 }

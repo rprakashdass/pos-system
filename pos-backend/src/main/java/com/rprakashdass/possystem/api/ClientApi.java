@@ -1,12 +1,14 @@
 package com.rprakashdass.possystem.api;
 
-import com.rprakashdass.possystem.dao.ClientDao;
-import com.rprakashdass.possystem.pojo.Client;
-import jakarta.transaction.Transactional;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.rprakashdass.possystem.dao.ClientDao;
+import com.rprakashdass.possystem.pojo.Client;
+
+import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
@@ -47,5 +49,10 @@ public class ClientApi {
 
     public List<Client> searchClients(Long id, String name, String email, String phoneNumber) {
         return clientDao.searchClients(id, name, email, phoneNumber);
+    }
+
+    public void delete(Long id) {
+        Client client = getById(id);
+        clientDao.delete(client);
     }
 }

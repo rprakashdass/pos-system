@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -10,7 +9,9 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Client, ClientFormData } from "@/types/clientTypes";
+import { ClientFormData } from "@/types/clientTypes";
+import { useToast } from "@/components/ui/toaster";
+import { getApiErrorMessage } from "@/lib/getApiErrorMessage";
 
 interface AddClientDialogProps {
   show: boolean;
@@ -29,6 +30,7 @@ const AddClientDialog: React.FC<AddClientDialogProps> = ({
     phoneNumber: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -37,13 +39,30 @@ const AddClientDialog: React.FC<AddClientDialogProps> = ({
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!formData.name.trim()) {
+      toast({ variant: "destructive", title: "Client name is required" });
+      return;
+    }
+    if (!formData.email.trim()) {
+      toast({ variant: "destructive", title: "Email is required" });
+      return;
+    }
+    if (!formData.phoneNumber.trim()) {
+      toast({ variant: "destructive", title: "Phone number is required" });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       await onSubmit(formData);
+      toast({ title: "Client created" });
       setFormData({ name: "", email: "", phoneNumber: "" });
       onClose();
     } catch (error) {
-      console.error("Error in AddClientDialog:", error);
+      const msg = getApiErrorMessage(error);
+      toast({ variant: "destructive", title: msg.title, description: msg.description });
+      throw error;
     } finally {
       setIsSubmitting(false);
     }

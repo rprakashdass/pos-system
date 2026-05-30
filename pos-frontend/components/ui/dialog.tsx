@@ -16,7 +16,7 @@ const Dialog = ({ show, onClose, children }: DialogProps) => {
         className="fixed inset-0" 
         onClick={onClose}
       />
-      <div className="relative w-full max-w-lg bg-white text-gray-900 p-6 shadow-2xl border border-gray-200 rounded-lg animate-in fade-in zoom-in duration-200 m-4">
+      <div className="relative w-full max-w-lg bg-background text-foreground p-6 shadow-2xl border border-border rounded-lg animate-in fade-in zoom-in duration-200 m-4">
         {children}
       </div>
     </div>

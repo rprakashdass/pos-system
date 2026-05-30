@@ -16,4 +16,9 @@ public class UserForm {
     @NotBlank
     @Email(message = "Invalid email format")
     private String email;
+
+    @NotBlank
+    private String password;
+
+    private String phoneNumber;
 }

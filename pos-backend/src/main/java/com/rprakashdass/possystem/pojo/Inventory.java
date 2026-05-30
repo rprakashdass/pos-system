@@ -1,6 +1,15 @@
 package com.rprakashdass.possystem.pojo;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,10 +17,10 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(
-        name = "products",
-        uniqueConstraints = { @UniqueConstraint(name = "uk_product_id", columnNames = "product_id")},
+        name = "inventory",
+        uniqueConstraints = { @UniqueConstraint(name = "uk_inventory_product_id", columnNames = "product_id")},
         indexes = {
-                @Index(name = "idx_product_id", columnList = "product_id")
+                @Index(name = "idx_inventory_product_id", columnList = "product_id")
         }
 )
 public class Inventory extends BaseEntity {
