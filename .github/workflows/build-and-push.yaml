@@ -60,6 +60,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          # linux/amd64
 
       # Step 6: Build and push pos-frontend
       - name: Build and push pos-frontend
