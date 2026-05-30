@@ -1,42 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import apiService from "@/services/apiService";
+import { useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { useAuth } from '@/services/authService';
 
-const publicRoutes = new Set(["/login", "/signup"]);
+const publicRoutes = new Set(['/login', '/signup']);
 
 export const AuthGate = ({ children }: { children: React.ReactNode }) => {
-  const pathname = usePathname();
+  const { isLoggedIn, isLoading } = useAuth();
   const router = useRouter();
-  const [ready, setReady] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
-    const isPublic = publicRoutes.has(pathname);
+    if (!isLoading && !isLoggedIn && !publicRoutes.has(pathname)) {
+      router.push('/login');
+    }
+  }, [isLoggedIn, isLoading, pathname, router]);
 
-    const check = async () => {
-      try {
-        await apiService.get("/auth/me");
-        if (isPublic) {
-          router.replace("/");
-          return;
-        }
-        setReady(true);
-      } catch {
-        if (!isPublic) {
-          router.replace("/login");
-          return;
-        }
-        setReady(true);
-      }
-    };
-
-    void check();
-  }, [pathname, router]);
-
-  if (!ready && !publicRoutes.has(pathname)) {
-    return null;
-  }
+  if (isLoading) return null;
+  if (!isLoggedIn && !publicRoutes.has(pathname)) return null;
 
   return <>{children}</>;
 };

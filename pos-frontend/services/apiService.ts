@@ -1,6 +1,8 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
-const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8082/api';
+// Prefer same-origin API calls (e.g. /api/*) so the app can be deployed
+// behind a reverse proxy / auth gateway without hard-coding origins.
+const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || '/api';
 
 class ApiService {
   private api: AxiosInstance;
@@ -11,16 +13,19 @@ class ApiService {
       headers: {
         'Content-Type': 'application/json',
       },
+      // Allow gateways / upstream to use cookie-based sessions if desired.
       withCredentials: true,
     });
 
-    this.api.interceptors.request.use(
-      (config) => config,
-      (error) => {
-        console.error('API Request Error:', error);
-        return Promise.reject(error);
+    this.api.interceptors.request.use((config) => {
+      if (typeof window !== 'undefined') {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
       }
-    );
+      return config;
+    });
   }
 
   async get<T>(endpoint: string, config?: AxiosRequestConfig): Promise<T> {
@@ -28,12 +33,12 @@ class ApiService {
     return response.data;
   }
 
-  async post<T>(endpoint: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  async post<T>(endpoint: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
     const response = await this.api.post<T>(endpoint, data, config);
     return response.data;
   }
 
-  async put<T>(endpoint: string, data: any, config?: AxiosRequestConfig): Promise<T> {
+  async put<T>(endpoint: string, data: unknown, config?: AxiosRequestConfig): Promise<T> {
     const response = await this.api.put<T>(endpoint, data, config);
     return response.data;
   }
@@ -44,4 +49,6 @@ class ApiService {
   }
 }
 
-export default new ApiService();
+const apiService = new ApiService();
+export { apiService };
+export default apiService;
