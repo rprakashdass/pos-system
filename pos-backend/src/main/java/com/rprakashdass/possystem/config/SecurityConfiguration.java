@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfiguration {
 
     private static final String[] WHITE_LIST_URL = {
+            "/health",
             "/v1/auth/**",
             "/v2/api-docs",
             "/v3/api-docs",
