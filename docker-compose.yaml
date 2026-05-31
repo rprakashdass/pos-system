@@ -53,6 +53,15 @@ services:
       timeout: 5s
       retries: 5
 
+  hazelcast-mc:
+    image: hazelcast/management-center:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - MC_DEFAULT_CLUSTER_MEMBERS=pos-backend:5701
+    networks:
+      - pos-network
+
 volumes:
   mysql_data:
   backend_logs:

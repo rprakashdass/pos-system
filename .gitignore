@@ -1,0 +1,26 @@
+# Maven
+pos-backend/target/
+pos-backend/*.log
+pos-backend/logs/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Node
+pos-frontend/node_modules/
+pos-frontend/.next/
+pos-frontend/tsconfig.tsbuildinfo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets / env
+.env
+.env.local
+.env.*.local
+
+# Docker
+*.tar

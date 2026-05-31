@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Dialog, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Product, ProductFormData } from "@/types/productTypes";
 import { Client } from "@/types/clientTypes";
@@ -69,7 +70,7 @@ const ProductDialog: React.FC<ProductDialogProps> = ({
     }
 
     setFormData(emptyForm);
-  }, [show, mode, initialProduct]);
+  }, [show, mode, initialProduct, toast]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -126,56 +127,76 @@ const ProductDialog: React.FC<ProductDialogProps> = ({
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          <Input
-            name="name"
-            placeholder="Product Name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
-          <Input
-            name="barcode"
-            placeholder="Barcode"
-            value={formData.barcode}
-            onChange={handleChange}
-            required
-          />
-          <Input
-            name="description"
-            placeholder="Description (optional)"
-            value={formData.description ?? ""}
-            onChange={handleChange}
-          />
-          <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-2">
+            <Label htmlFor="product-name">Product Name</Label>
             <Input
-              name="price"
-              type="number"
-              step="0.01"
-              placeholder="Price"
-              value={String(formData.price)}
+              id="product-name"
+              name="name"
+              placeholder="Product Name"
+              value={formData.name}
               onChange={handleChange}
               required
             />
-            <select
-              name="clientId"
-              value={String(formData.clientId)}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  clientId: Number(e.target.value),
-                }))
-              }
-              className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-              disabled={loadingClients}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="product-barcode">Barcode</Label>
+            <Input
+              id="product-barcode"
+              name="barcode"
+              placeholder="Barcode"
+              value={formData.barcode}
+              onChange={handleChange}
               required
-            >
-              <option value="0">{loadingClients ? "Loading clients..." : "Select client"}</option>
-              {clients.map((client) => (
-                <option key={client.id} value={client.id}>
-                  {client.name} (#{client.id})
-                </option>
-              ))}
-            </select>
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="product-description">Description</Label>
+            <Input
+              id="product-description"
+              name="description"
+              placeholder="Description (optional)"
+              value={formData.description ?? ""}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="product-price">Price</Label>
+              <Input
+                id="product-price"
+                name="price"
+                type="number"
+                step="0.01"
+                placeholder="Price"
+                value={String(formData.price)}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="product-client">Client</Label>
+              <select
+                id="product-client"
+                name="clientId"
+                value={String(formData.clientId)}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    clientId: Number(e.target.value),
+                  }))
+                }
+                className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                disabled={loadingClients}
+                required
+              >
+                <option value="0">{loadingClients ? "Loading clients..." : "Select client"}</option>
+                {clients.map((client) => (
+                  <option key={client.id} value={client.id}>
+                    {client.name} (#{client.id})
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
